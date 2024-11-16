@@ -5,20 +5,22 @@ function toggleElements(show) {
     const elements = document.querySelectorAll("div");
     elements.forEach((element) => {
         if (element.className === targetClass) {
-            element.style.display = show ? "none" : ""; // "" restores the default display
+            element.style.display = show ? "none" : "";
         }
+    });
+}
+
+// Initialize as soon as possible
+if (chrome.storage && chrome.storage.local) {
+    chrome.storage.local.get(['isEnabled'], (result) => {
+        isEnabled = result.isEnabled !== false;
+        toggleElements(isEnabled);
     });
 }
 
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     isEnabled = request.isEnabled;
-    toggleElements(isEnabled);
-});
-
-// Load saved state when content script starts
-chrome.storage.local.get(['isEnabled'], (result) => {
-    isEnabled = result.isEnabled !== false; // Default to true if not set
     toggleElements(isEnabled);
 });
 
